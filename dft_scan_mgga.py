@@ -53,8 +53,6 @@ def do_ML(train, X, X_test, Y, sigma, Q, Q_test):
   random.shuffle(total)
   training_index = total[:train]
 
-#  K      = laplacian_kernel(X[training_index], X[training_index], sigma)
-#  K_test = laplacian_kernel(X[training_index], X_test, sigma)
   K      = get_local_symmetric_kernel_mbdf(X[training_index],  Q[training_index], sigma)
   K_test = get_local_kernel_mbdf(X_test, X[training_index], Q_test, Q[training_index], sigma)
 
@@ -82,19 +80,9 @@ def opt_sigma(train_set_size):
 def do_LC(X_train, X_test, Q_train, Q_test, Y_LDA, Y_GGA, Y_mGGA, Y_HYBRID, Y_test, func_gga, func_mgga, func_hybrid):
 
   # direct learning
-  #N_CCSD = [ 2,  4,  8,  16,  32,  64,  128,  256,  512]#, 1024, 2048, 4096, 6600]
-
-# s2
-#  N_LDA    = [ 4096]
-#  N_GGA    = [ 1024]# 2048]
-#  N_HYBRID = [  256]#  512]
   N_LDA    = [32, 64, 128, 256, 512, 1024, 2048, 4096]
   N_GGA    = [ 8, 16,  32,  64, 128,  256,  512, 1024]
   N_HYBRID = [ 2,  4,   8,  16,  32,   64,  128,  256]
-
-#  N_CCSD   =  [ 90]
-#  N_CCSD = [  2,    4,    8,   16,   32,    64, ]#  128]
-
 
   e_multi    = np.array([])
 
@@ -105,9 +93,6 @@ def do_LC(X_train, X_test, Q_train, Q_test, Y_LDA, Y_GGA, Y_mGGA, Y_HYBRID, Y_te
       MAE_multi   = np.array([])
 
       for train in range(len(N_LDA)):
-      #for train in range(1):
-        # Direct Learning QML
-        #Y_HF_direct, idxs_HF  = do_ML(split, N_HF[train], X, X_test, cYprime_HF, sigma_HF[-1], ll_HF[-1], Q, Q_test)
         s_LDA = opt_sigma(N_LDA[train])
         Yp_LDA_direct  = do_ML(N_LDA[train], X_train, X_test, Y_LDA, s_LDA, Q_train, Q_test)
 
@@ -117,30 +102,18 @@ def do_LC(X_train, X_test, Q_train, Q_test, Y_LDA, Y_GGA, Y_mGGA, Y_HYBRID, Y_te
         s_HYBRID = opt_sigma(N_HYBRID[train])
         Yp_GGA_HYBRID   = do_ML(N_HYBRID[train], X_train, X_test, Y_HYBRID, s_HYBRID, Q_train, Q_test)
 
-#        s_CCSD = opt_sigma(N_CCSD[train])
-#        Yp_HYBRID_CCSD   = do_ML(N_CCSD[train], X_train, X_test, Y_CCSD, s_CCSD, Q_train, Q_test)
-
-        # get energy prediction 2- and 3- levels
         Y_multi  = Yp_LDA_direct + Yp_LDA_GGA + Yp_GGA_HYBRID
-#        Y_multi  = Yp_LDA_GGA + Yp_GGA_HYBRID + Yp_HYBRID_CCSD
 
         mae_multi   = np.mean(np.abs(Y_multi-Y_test))
         MAE_multi   = np.append(MAE_multi, mae_multi)
-        #print("N: {:.2f},\tMAE: {:.2f}".format(N_CCSD[train], mae_multi))
 
       e_multi   = np.append(e_multi, np.asarray(MAE_multi))
 
   e_multi   = e_multi.reshape(nModels,len(N_LDA)).mean(axis=0)
-#  e_multi = e_multi[0]
+
   for i in range(len(N_HYBRID)):
     print("{:.2f},{:.4f}".format(N_HYBRID[i], e_multi[i]))
 
-
-#  print("{},{},{:.6f}".format(func_hybrid, func_mgga, e_multi))
-#  f = open("results_scan_mGGA_dft.txt", 'a')
-#  f.write("{},{},{:.6f}\n".format(func_hybrid, func_mgga, e_multi))
-#  f.close()
-#
   return True
 
 
@@ -178,29 +151,12 @@ def main():
 #    names, energies = read_CCSD(filename_CCSD)
     random.seed(667)
 
-    # Create a combined list
-#    combined_list = list(zip(names, energies))
-
-    # Shuffle the combined list
-#    random.shuffle(combined_list)
-
-    # Unpack the shuffled lists
-#    names, energies = zip(*combined_list)
-
-#    df_ccsd = pd.DataFrame()
-#    df_ccsd['names'] = names
-#    df_ccsd['CCSD(T)'] = energies
-
-#    names_train = names[:-1000]
-#    names_test = names[-1000:]
-
     df = read_DFT(filename_DFT)
 
     df['names'] = 'dsgdb9nsd_' + df['index'].astype(str).str.zfill(6)
 
     print(df)
-#    df_train = df[df['names'].isin(names_train)]
-#    df_test = df[df['names'].isin(names_test)]
+
     array1_length = 15000
     array2_length = 3000
 
@@ -214,9 +170,9 @@ def main():
     df_test = df.sample(n=array2_length, random_state=42)
 
     names_all = np.concatenate((df_train['names'].to_numpy(), df_test['names'].to_numpy()))
-#
+
     print(" [ {}OK{} ] Read data".format(GREEN, WHITE))
-#
+
     mols = []
 
     spinner = yaspin(text="Calculate Representation", color="yellow")
@@ -237,43 +193,23 @@ def main():
     end = time()
     spinner.stop()
     np.savez("scan_dft.npz", X=X, Q=Q, df_train=df_train, df_test=df_test)
-#    print(" [ {}OK{} ] Calculate in Representation ({:.2f} min)".format(GREEN, WHITE, (end-start)/60.))
-#    print("\n [    ] Read data from npz")
-#    data = np.load("scan.npz", allow_pickle=True)
-#    X = data['X']
-#    Q = data['Q']
-#    print(" [ {}OK{} ] Read data from npz".format(GREEN, WHITE))
+
 
     Y_LDA = df_train['LDA(VWN)_TZP'].to_numpy()
     #Y_LDA *= 23
     X_train, Q_train = X[:-3000], Q[:-3000]
     X_test, Q_test   = X[-3000:], Q[-3000:]
 
-#    print("\nfunctional_hybrid,functional_mgga,e_direct")
-#
-#    os.system("rm -f results_scan_mGGA_dft.txt")
-#    f = open("results_scan_mGGA_dft.txt", 'a')
-#    f.write("functional_hybrid,functional_mgga,e_direct\n")
-#    f.close()
-
     for hybrid in Hybrid:
         for mgga in MetaGGA:
-#            for gga in GGA:
-                #mgga = gga
                 gga = mgga
 
                 Y_GGA    = df_train[gga + "_TZP"].to_numpy() -  Y_LDA
                 Y_mGGA   = df_train[mgga + "_TZP"].to_numpy()  - Y_LDA
 
                 Y_HYBRID = df_train[hybrid + "_TZP"].to_numpy() - df_train[mgga + "_TZP"].to_numpy()
-#                Y_CCSD   = df_train["CCSD(T)"].to_numpy() - df_train[hybrid + "_TZP"].to_numpy()
                 Y_test   = df_test[hybrid + "_TZP"].to_numpy()
 
-                #Y_GGA    *= 23
-                #Y_mGGA   *= 23
-                #Y_HYBRID *= 23
-                ##Y_CCSD   *= 23
-                #Y_test   *= 23
 
                 isDone = do_LC(X_train, X_test, Q_train, Q_test, Y_LDA, Y_GGA, Y_mGGA, Y_HYBRID, Y_test, gga, mgga, hybrid)
                 exit()
