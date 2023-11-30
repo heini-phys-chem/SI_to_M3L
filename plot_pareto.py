@@ -44,18 +44,11 @@ def get_ratios(N, cpu):
 
 
 def main():
-#    get_ratios(x_qm7b, y_qm7b)
-#    get_ratios(x_qm20, y_qm20)
-#    get_ratios(x_ae, y_ae)
-#    get_ratios(x_ea, y_ea)
-#    get_ratios(x_egp, y_egp)
-    #exit()
+
     fig, ax = plt.subplots()
     ax.set_xscale('log')
     ax.set_yscale('log')
 
-    #ax.axhline(y=24, color='k', alpha=0.5, linestyle="--", lw=2)
-    #ax.text(x=12000, y=30, s="1 day")
     ax.axhline(y=168, color='k', alpha=0.5, linestyle="--", lw=2)
     ax.text(x=11000, y=200, s="1 week")
     ax.axhline(y=672, color='k', alpha=0.5, linestyle="--", lw=2)
@@ -64,12 +57,8 @@ def main():
     ax.text(x=10000, y=5000, s="1 year")
     ax.axhline(y=100000, color='k', alpha=0.5, linestyle="--", lw=2)
     ax.text(x=9500, y=60000, s="10 years")
-    #ax.axhline(y=1000000, color='k', alpha=0.5, linestyle="--", lw=2)
-    #ax.text(x=8500, y=500000, s="100 years")
 
     markers = ["s", "d", "v", "^", "*", "o"]
-
-
     plot_single_pareto(ax, x_qm7b, y_qm7b, "C0", markers)
     plot_single_pareto(ax, x_qm20, y_qm20, "C1", markers)
     plot_single_pareto(ax, x_ae, y_ae, "C2", markers)
@@ -92,18 +81,12 @@ def main():
                 Line2D([0], [0], color="C2", lw=3, label="QM9 CCSD(T) AE"),
                 Line2D([0], [0], color="C3", lw=3, label="QM9 CCSD(T) EA"),
                 Line2D([0], [0], color="C4", lw=3, label="EGP"),
-                       # markers
                 Line2D([0], [0], color="k", marker="o", label="M2L"),
                 Line2D([0], [0], color="k", marker="d", label=r'Cost'),
                 Line2D([0], [0], color="k", marker="s", label=r'Guess'),
                 Line2D([0], [0], color="k", marker="v", label=r'$\beta=0.25$'),
                 Line2D([0], [0], color="k", marker="^", label=r'$\beta=0.50$'),
                 Line2D([0], [0], color="k", marker="*", label=r'$\beta=0.75$'),
-#                Line2D([0], [0], color="k", marker=">", label=r'$\beta=0.65$'),
-#                Line2D([0], [0], color="k", marker="D", label=r'$\beta=0.85$'),
-#                Line2D([0], [0], color="k", marker="x", label=r'$\beta=0.95$'),
-#                Line2D([0], [0], color="k", marker="<", label=r'Grid Scan'),
-#                Line2D([0], [0], color="k", marker="p", label=r'$\beta$ opt'),
                     ]
     ax.legend(handles=legend_elements, ncols=2, fontsize=9)
 
