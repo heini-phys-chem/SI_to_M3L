@@ -50,13 +50,6 @@ def set_axes(ax):
 # Set default font size
 mpl.rcParams['font.size'] = 20
 
-## Load data from files
-#filenames_qm7 = ["direct_qm7.txt", "s2_qm7.txt", "guess_qm7.txt", "cpu_qm7.txt", "b25_qm7.txt", "b50_qm7.txt", "b75_qm7.txt" ]
-#filenames_qm7 = ["direct_qm7.txt", "s2_qm7.txt", "guess_qm7_new.txt", "cpu_qm7.txt", "b25_qm7.txt", "b50_qm7.txt", "b75_qm7.txt" ]
-#filenames_qm9lcc = ["direct_qm9lcc.txt", "s2_qm9lcc.txt", "guess_qm9lcc.txt", "cpu_qm9lcc.txt", "b25_qm9lcc.txt", "b50_qm9lcc.txt", "b75_qm9lcc.txt" ]
-#filenames_ae = ["direct_ae.txt", "s2_ae.txt", "guess_ae.txt", "cpu_ae.txt", "b25_ae.txt", "b50_ae.txt", "b75_ae.txt" ]
-#filenames_ea  = ["data/direct_ea.txt", "data/s2_ea.txt", "data/guess_ea.txt", "data/cpu_ea.txt", "data/b25_ea.txt", "data/b50_ea.txt", "data/b75_ea.txt" ]
-#filenames_egp = ["data/direct_egp.txt", "data/s2_egp.txt", "data/guess_egp.txt", "data/cpu_egp.txt", "data/b25_egp.txt", "data/b50_egp.txt", "data/b75_egp.txt" ]
 filenames_qm7 = ["direct_qm7.txt", "s2_qm7.txt", "results_qm7b.txt", "cpu_qm7.txt", "b25_qm7.txt", "b50_qm7.txt", "b75_qm7.txt" ]
 filenames_qm9lcc = ["direct_qm9lcc.txt", "s2_qm9lcc.txt", "results_qm20k.txt", "cpu_qm9lcc.txt", "b25_qm9lcc.txt", "b50_qm9lcc.txt", "b75_qm9lcc.txt" ]
 filenames_ae = ["direct_ae.txt", "s2_ae.txt", "results_qm9AE.txt", "cpu_ae.txt", "b25_ae.txt", "b50_ae.txt", "b75_ae.txt" ]
@@ -68,14 +61,6 @@ colors = ["C0", "C3", "C5", "C1", "C2", "C2", "C2", "C2", "C2"]
 markers = ["p", "o", "s", "d", "v", "^", "*" ]
 linestyles = ["-", "--",  ":", "-.", "-.", "-.", "-.", "-"]
 labels = [ "Direct", "M2L", "Guess", "Cost", r'$\beta=0.25$', r'$\beta=0.5$', r'$\beta=0.75$']
-
-#filenames = ["data/direct.txt", "data/bopt.txt", "data/s2.txt", "data/guess.txt"]
-#
-## Define line colors, markers, and linestyles for each curve
-#colors = ["C0", "C1",  "C2", "C3", "C3", "C3", ]
-#markers = ["o", "^", "v", "x", "s", "*", "d", "D"]
-#linestyles = ["-", "--", "--", ":", "-.", "-.", "-.", "-.",]
-#labels = [ "Direct", "Bopt",  "s2", "guess", "B2", "B3",]
 
 # Create figure and axis objects
 fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(30,6))
@@ -182,9 +167,6 @@ for i, filename in enumerate(filenames_egp):
     ax.loglog(N, MAE, marker=markers[i], linestyle=linestyles[i], color=colors[i], label=labels[i])
 
 set_axes(ax)
-
-# Add horizontal line at 1 kcal/mol with alpha 0.5
-#ax.axhline(y=1, linestyle='--', color='cyan', alpha=0.5)
 
 # Set xticks
 set_axes(ax)
