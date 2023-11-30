@@ -127,8 +127,6 @@ class CostFunction(object):
           Y_HF_3lvl = np.dot(Kt, alpha)
 
           # HF -> MP2
-          #K  = get_local_symmetric_kernels(Xi[training_index_MP2], Q[training_index_MP2], [sigma2])
-          #Kt = get_local_kernel(Xi[training_index_MP2], Xt[test_index], Q[training_index_MP2], Qt[test_index], sigma2)
           sigma_MP2   = self.opt_sigma(N_MP2, "MP2")
           K  = get_local_symmetric_kernel_mbdf(X[training_index_MP2],  Q[training_index_MP2], sigma_MP2)
           Kt = get_local_kernel_mbdf(X[training_index_MP2], Xt, Q[training_index_MP2], Qt, sigma_MP2)
@@ -139,8 +137,6 @@ class CostFunction(object):
           Y_HF_MP2 = np.dot(Kt, alpha)
 
           # MP2 -> CCSD(T)
-          #K  = laplacian_kernel(Xi[training_index_CCSD], Xi[training_index_CCSD], sigma3)
-          #Kt = laplacian_kernel(Xi[training_index_CCSD], Xt[test_index], sigma3)
           sigma_CCSD   = self.opt_sigma(N_CCSD, "CCSD")
           K  = get_local_symmetric_kernel_mbdf(X[training_index_CCSD],  Q[training_index_CCSD], sigma_CCSD)
           Kt = get_local_kernel_mbdf(X[training_index_CCSD], Xt, Q[training_index_CCSD], Qt, sigma_CCSD)
@@ -168,20 +164,15 @@ class CostFunction(object):
 
 
     def get_mae(self, parameters):
-        #f = open("s2_newCost_CPU_real_2.txt", 'a')
         f = open("cpu.txt", 'a')
         gamma1 = parameters[0]
         gamma2 = parameters[1]
         gamma3 = parameters[2]
-#        beta   = parameters[3]
 
         beta = 0.75
         start_cv = time()
         mae, stddev, CPU, sigma1, sigma2, sigma3 = self.calc_maes(self.X, self.Q, self.Xt, self.Qt, gamma1, gamma2, gamma3)
         end_cv = time()
-
-#        if mae < 0.9:
-#            mae = 10.0
 
         if mae > 2.4: CPU = 1e6
         mae_scaled = (mae - 1.89) / (133.49 - 1.89)
@@ -197,8 +188,6 @@ class CostFunction(object):
 
         print("\nCCSD(T): {} ({}), MP2: {} ({}), HF: {} ({})\n-----------------------------------------------\nCost: {:.4f} +/- {:.4f} kcal/mol       time = {:.4f}\nMAE: {:.4f}, CPU: {:.4f}\n".format(int(gamma3), sigma3, int(gamma2), sigma2, int(gamma1), sigma1, combined, stddev, (end_cv-start_cv), mae, CPU))
         f.write("\nCCSD(T): {} ({}), MP2: {} ({}), HF: {} ({})\n-----------------------------------------------\nCost: {:.4f} +/- {:.4f} kcal/mol       time = {:.4f}\nMAE: {:.4f}, CPU: {:.4f}\n".format(int(gamma3), sigma3, int(gamma2), sigma2, int(gamma1), sigma1, combined, stddev, (end_cv-start_cv), mae, CPU))
-        #print("\nCCSD(T): {} ({}), MP2: {} ({}), HF: {} ({})\n-----------------------------------------------\nMAE: {:.4f}, CPU: {:.4f}\n".format(int(gamma3), sigma3, int(gamma2), sigma2, int(gamma1), sigma1, mae, CPU ))
-        #f.write("\nCCSD(T): {} ({}), MP2: {} ({}), HF: {} ({})\n-----------------------------------------------\nMAE: {:.4f}, CPU: {:.4f}\n".format(int(gamma3), sigma3, int(gamma2), sigma2, int(gamma1), sigma1, mae, CPU))
         f.close()
 
 
@@ -250,21 +239,15 @@ def main():
     #cmd = "rm -f s2_newCost_CPU_real.txt"
 
     cost = CostFunction(X, Q, Xt, Qt, idx_train, idx_test, Y_HF, Y_HF_MP2, Y_MP2_CCSD, HF_times, MP2_times, CCSD_times, Y_test)
-
-    #dims=[[10, 6800], [10, 6800], [10, 6800]] #list of bounds on the parameters, tuple means continuous list means discrete
-    #dims=[[10, 6000], [10, 2024], [10, 556], (0.1, 0.9)] #list of bounds on the parameters, tuple means continuous list means discrete
     dims=[[2, 3700], [2, 2024], [2, 556]] #list of bounds on the parameters, tuple means continuous list means discrete
 
     x0=[3700, 1024, 256] #initial guess point for the parameters
-    #x0=[4096, 1024, 256, 0.85] #initial guess point for the parameters
-    #x0=[3000, 376, 175] #initial guess point for the parameters
 
     start = time()
     res=gp_minimize(cost.get_mae, dimensions=dims, x0=x0, n_initial_points=30, n_calls=300, noise=1e-5) #performs GP based bayesian opt
     end = time()
     print("Total time needed: {:.2f}".format((end-start)/60.))
     print(res.x) #values of the best parameters found
-#    print(res.y) #value of the best cost
     f = open("cpu.txt", 'a')
     f.write("{},{},{}\n".format(res.x[0], res.x[1], res.x[2]))
 
